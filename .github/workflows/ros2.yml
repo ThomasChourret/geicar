@@ -21,6 +21,12 @@ jobs:
         with:
           required-ros-distributions: humble
 
+      - name: Install additional ROS packages
+        run: |
+          sudo apt update
+          sudo apt install -y ros-humble-ament-cmake-auto
+
+
       # 3. Install dependencies for both workspaces
       - name: Install ROS dependencies
         run: |
