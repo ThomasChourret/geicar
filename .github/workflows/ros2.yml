@@ -1,0 +1,48 @@
+name: ROS2 Humble CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup ROS 2 Humble environment
+      - name: Setup ROS 2 Humble
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: humble
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+
+      # 4. Build the workspace
+      - name: Build workspace
+        run: |
+          colcon build --symlink-install --cmake-args -DBUILD_TESTING=ON
+
+      # 5. Run tests
+      - name: Run tests
+        run: |
+          colcon test
+          colcon test-result --verbose
+
+      # 6. Upload test logs (always run, even if tests fail)
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ros2-test-results
+          path: log/latest_test/
