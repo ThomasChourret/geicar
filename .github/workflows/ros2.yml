@@ -8,41 +8,55 @@ on:
 
 jobs:
   build_and_test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup ROS 2 Humble environment
+      # 2. Setup ROS 2 Humble
       - name: Setup ROS 2 Humble
         uses: ros-tooling/setup-ros@v0.7
         with:
           required-ros-distributions: humble
 
-      # 3. Install dependencies
-      - name: Install dependencies
+      # 3. Install dependencies for both workspaces
+      - name: Install ROS dependencies
         run: |
           sudo apt update
           rosdep update
-          rosdep install --from-paths src --ignore-src -r -y
+          rosdep install --from-paths jetsonNano/ros2_ws/src --ignore-src -r -y
+          rosdep install --from-paths raspberryPI3/ros2_ws/src --ignore-src -r -y
 
-      # 4. Build the workspace
-      - name: Build workspace
+      # 4. Build and test Jetson Nano workspace
+      - name: Build Jetson Nano workspace
         run: |
+          cd jetsonNano/ros2_ws
           colcon build --symlink-install --cmake-args -DBUILD_TESTING=ON
-
-      # 5. Run tests
-      - name: Run tests
+      - name: Test Jetson Nano workspace
         run: |
+          cd jetsonNano/ros2_ws
           colcon test
           colcon test-result --verbose
 
-      # 6. Upload test logs (always run, even if tests fail)
+      # 5. Build and test Raspberry Pi 3 workspace
+      - name: Build Raspberry Pi 3 workspace
+        run: |
+          cd raspberryPI3/ros2_ws
+          colcon build --symlink-install --cmake-args -DBUILD_TESTING=ON
+      - name: Test Raspberry Pi 3 workspace
+        run: |
+          cd raspberryPI3/ros2_ws
+          colcon test
+          colcon test-result --verbose
+
+      # 6. Upload all test logs
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ros2-test-results
-          path: log/latest_test/
+          path: |
+            jetsonNano/ros2_ws/log/latest_test/
+            raspberryPI3/ros2_ws/log/latest_test/
