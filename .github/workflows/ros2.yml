@@ -38,10 +38,12 @@ jobs:
       # 4. Build and test Jetson Nano workspace
       - name: Build Jetson Nano workspace
         run: |
+          source /opt/ros/humble/setup.bash
           cd jetsonNano/ros2_ws
           colcon build --symlink-install --cmake-args -DBUILD_TESTING=ON
       - name: Test Jetson Nano workspace
         run: |
+          source /opt/ros/humble/setup.bash
           cd jetsonNano/ros2_ws
           colcon test
           colcon test-result --verbose
@@ -49,10 +51,12 @@ jobs:
       # 5. Build and test Raspberry Pi 3 workspace
       - name: Build Raspberry Pi 3 workspace
         run: |
+          source /opt/ros/humble/setup.bash
           cd raspberryPI3/ros2_ws
           colcon build --symlink-install --cmake-args -DBUILD_TESTING=ON
       - name: Test Raspberry Pi 3 workspace
         run: |
+          source /opt/ros/humble/setup.bash
           cd raspberryPI3/ros2_ws
           colcon test
           colcon test-result --verbose
