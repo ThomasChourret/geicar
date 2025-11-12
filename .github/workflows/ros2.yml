@@ -25,6 +25,11 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y ros-humble-ament-cmake-auto
+          sudo apt install -y ros-humble-camera-info-manager \
+                        ros-humble-image-transport \
+                        ros-humble-image-transport-plugins \
+                        v4l-utils \
+                        ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev
 
 
       # 3. Install dependencies for both workspaces
